@@ -1,0 +1,51 @@
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import stats
+
+def plot_regression_with_uncertainty(x_values, y_values, x_errors, y_errors, x_scale_factor=1e-33, x_label="X", y_label="Y", title="Regression Plot"):
+    """
+    Plots a regression line with uncertainties in x and y values.
+
+    Args:
+        x_values: Array of x values.
+        y_values: Array of y values.
+        x_errors: Array of uncertainties in x values.
+        y_errors: Array of uncertainties in y values.
+        x_scale_factor: Factor to scale down x values for plotting (default: 1e-33).
+        x_label: Label for the x-axis (default: "X").
+        y_label: Label for the y-axis (default: "Y").
+        title: Title of the plot (default: "Regression Plot").
+    """
+
+    # Calculate the regression line
+    slope, intercept, r_value, p_value, std_err = stats.linregress(x_values, y_values)
+
+    # Create the plot
+    plt.figure(figsize=(8, 6))
+    plt.errorbar(x_values / x_scale_factor, y_values, xerr=x_errors / x_scale_factor, yerr=y_errors, fmt='o', capsize=3, label='Data Points')
+
+    # Plot the regression line
+    x_fit = np.linspace(min(x_values), max(x_values), 100)
+    y_fit = slope * x_fit + intercept
+    plt.plot(x_fit / x_scale_factor, y_fit, color='red', label='Regression Line')
+
+    # Set labels and title
+    plt.xlabel(f"{x_label} ({x_scale_factor:.2e})")
+    plt.ylabel(y_label)
+    plt.title(title)
+
+    # Add regression equation to the plot
+    equation_text = f"y = {slope:.5e}x + {intercept:.5e}"
+    plt.text(0.95, 0.05, equation_text, transform=plt.gca().transAxes, fontsize=12,
+             verticalalignment='bottom', horizontalalignment='right', bbox=dict(facecolor='white', alpha=0.7))
+
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+x_values = np.array([4.0059e33, 3.56887e33, 3.15541e33, 2.98811e33, 2.90012e33, 2.97813e33, 4.02833e33, 3.31765e33, 2.86636e33, 3.16555e33, 3.16181e33, 4.55935e33, 2.98907e33])
+y_values = np.array([2.23, 1.99, 1.61, 1.49, 1.56, 1.49, 2.26, 1.78, 1.55, 1.61, 1.61, 2.64, 1.49])
+x_errors = np.array([1.24268e32, 1.23561e32, 4.09491e31, 4.06614e31, 4.2405e31, 3.92475e31, 1.18771e32, 1.27269e32, 5.12628e31, 3.86329e31, 5.1769e31, 9.33217e31, 4.34382e31])
+y_errors = np.array([0.005, 0.005, 0.005, 0.005, 0.005, 0.005, 0.005, 0.005, 0.005, 0.005, 0.005, 0.005, 0.005])
+
+plot_regression_with_uncertainty(x_values, y_values, x_errors, y_errors, x_scale_factor=1e33, x_label="c/eλ", y_label="Threshold Voltage (V)", title="Threshold Voltage vs c/eλ")
